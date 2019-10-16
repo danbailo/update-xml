@@ -2,8 +2,9 @@ import xmltodict
 import os
 
 class Xml:
-    def __init__(self, file):        
+    def __init__(self, file = None, cnpj = None):        
         self.__xml = file
+        self.__cpnj = cnpj
     
     def get_xml(self):
         if os.path.isfile(self.__xml):
@@ -16,8 +17,13 @@ class Xml:
             if len(xmls) == 0: return None
             return xmls
 
-    def update_fields(self):
+    def __check_cnpj(self, doc):
+        if self.__cpnj == doc['nfeProc']['NFe']['infNFe']["emit"]["CNPJ"]:
+            return True
+        return False            
 
+    def update_fields(self):
+        count = 0
         for xml in self.get_xml():      
             if len(self.get_xml()) == 1: 
                 fd = open(os.path.join(self.__xml))
@@ -25,6 +31,12 @@ class Xml:
                 fd = open(os.path.join(self.__xml,xml))
             
             doc = xmltodict.parse(fd.read())
+            if not self.__check_cnpj(doc):
+                # print("O CNPJ {cnpj} não foi encontrado!\n".format(cnpj=self.__cpnj))
+                continue
+            count = 1
+            print('O CNPJ "{cnpj}" foi encontrado no arquivo "{xml}"'.format(cnpj=self.__cpnj, xml=xml))
+
             if isinstance(doc['nfeProc']['NFe']["infNFe"]["det"], list):
                 for i in range(len(doc['nfeProc']['NFe']["infNFe"]["det"])):
                     new_doc = doc.copy()
@@ -89,7 +101,7 @@ class Xml:
             
             fd.close()
             with open(os.path.join("..","output",xml[:-4]+" - ALTERADO.xml"), 'w') as result_file:
-                print(f'Arquivo "{xml}" foi alterado com sucesso!')
-                result_file.write(xmltodict.unparse(new_doc,full_document=False))          
-        
-        
+                print(f'Arquivo "{xml}" foi alterado com sucesso!\n')
+                result_file.write(xmltodict.unparse(new_doc,full_document=False))
+        if count == 0 :
+            print("O CNPJ {cnpj} não foi encontrado em nenhum arquivo!\n".format(cnpj=self.__cpnj))         
