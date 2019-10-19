@@ -20,8 +20,8 @@ def get_args():
 		# dest="file",
 		type=str,
         required=True,
-		metavar="cnpj_emitente",
-		help="CNPJ emitente. Em caso de dúvidas, leia o arquivo README.md",
+		metavar="arquivo.csv",
+		help="Arquivo contendo os CNPJs emitentes. Em caso de dúvidas, leia o arquivo README.md",
 	)
 
 	return parser.parse_args()
