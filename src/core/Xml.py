@@ -29,12 +29,11 @@ class Xml:
         return set(all_cnpj)
 
     def update_fields(self):
-        with open("xml_diferentes.txt","w") as xml_diff: pass
         for xml in self.get_xml():
             if len(self.get_xml()) == 1: 
-                fd = open(os.path.join(self.__xml))
+                fd = open(os.path.join(self.__xml), encoding="utf8")
             else : 
-                fd = open(os.path.join(self.__xml,xml))
+                fd = open(os.path.join(self.__xml,xml), encoding="utf8")
             
             doc = xmltodict.parse(fd.read())
             for cnpj in self.get_cnpj():
