@@ -1,8 +1,7 @@
 # Atualizar arquivos XML
 
 ## Descrição
-Este projeto consiste em realizar algumas operações matemáticas em determinados arquivos XML, onde estes serão os arquivos que contenham
-um CPNJ que foi escrito no arquivo `cnpj.csv`.
+Este projeto consiste em realizar algumas operações matemáticas em determinados arquivos XML que contenham determinado CNPJ no campo emitente, onde os CNPJ que serão verificados estão escritos no arquivo [cnpj.csv](cnpj.csv).
 
 ---
 ## Requisitos
@@ -27,7 +26,7 @@ Para instalar as dependências, abra PowerShell/prompt de comando no diretório 
 ---
 ## Como usar
 
-Para executar o programa, abra um PowerShell/Prompt de Comando na pasta corrente e como parâmetro de execução do mesmo é preciso passar a pasta onde contém os arquivos XML ou um arquivo XML da pesquisa que foi realizada na OLX e como parâmetro opcional, você pode escolher o nome da planilha que será gravado os números.:
+Para executar o programa, abra um PowerShell/Prompt de Comando no diretório corrente e como parâmetro de execução do mesmo é preciso passar a pasta onde contém os arquivos XML ou um arquivo XML e também o arquivo onde contém os CNPJ que serão analisados.
 
 * `cd src`
 * **Comando para exibir ajuda**
