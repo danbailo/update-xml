@@ -29,6 +29,7 @@ class Xml:
         return set(all_cnpj)
 
     def update_fields(self):
+        with open("xml_diferentes.txt","w") as xml_diff: pass
         for xml in self.get_xml():
             if len(self.get_xml()) == 1: 
                 fd = open(os.path.join(self.__xml))
@@ -41,20 +42,15 @@ class Xml:
                     state = 1
                     break
                 else:
-                    # print("O CNPJ {cnpj} não foi encontrado!".format(cnpj=cnpj))
                     state = 0
-            if state == 0: continue
-        
+            if state == 0: continue        
             print('\nO CNPJ "{cnpj}" foi encontrado no arquivo "{xml}"'.format(cnpj=cnpj, xml=xml))
 
-            #XML com padrao diferente NF_000338513_ChaveAcesso_35190902645941000108550010003385131455009580.xml
-            #['nfeProc']['NFe']['infNFe']['det'][0]['imposto']["ICMS"]['ICMS40'] - tem outros campos
             if isinstance(doc['nfeProc']['NFe']["infNFe"]["det"], list):
                 for i in range(len(doc['nfeProc']['NFe']["infNFe"]["det"])):
                     new_doc = doc.copy()
                     try:
                         vICMS = new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["ICMS"]["ICMS00"]["vICMS"]
-                        
                         #REGRA 1 E REGRA 3
                         vBC_PIS = new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["PIS"]["PISAliq"]["vBC"]
                         new_vBC_PIS = str(round(eval(vBC_PIS+'-'+vICMS),2))
@@ -63,26 +59,34 @@ class Xml:
                         vBC_COFINS = new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["COFINS"]["COFINSAliq"]["vBC"]
                         new_vBC_COFINS = str(round(eval(vBC_COFINS+'-'+vICMS),2))
                         new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["COFINS"]["COFINSAliq"]["vBC"] = new_vBC_COFINS
-
-                        #################################################################################
-
+                        
                         #REGRA 2
                         pPIS = new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["PIS"]["PISAliq"]["pPIS"]
                         new_vPIS = str(round(eval(pPIS+'*'+new_vBC_PIS),2))
                         new_vPIS = str(round(eval(new_vPIS+'*0.01'),2))
                         new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["PIS"]["PISAliq"]["vPIS"] = new_vPIS
-
+                        
                         #REGRA 4
                         pCOFINS = new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["COFINS"]["COFINSAliq"]["pCOFINS"]
                         new_vCOFINS = str(round(eval(pCOFINS+'*'+new_vBC_COFINS),2))
                         new_vCOFINS = str(round(eval(new_vCOFINS+'*0.01'),2))
                         new_doc['nfeProc']['NFe']['infNFe']['det'][i]['imposto']["COFINS"]["COFINSAliq"]["vCOFINS"] = new_vCOFINS
-
+                        
                         #REGRA 5
                         new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vPIS"] = new_vPIS
                         new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vCOFINS"] = new_vCOFINS
                     except Exception as err:
-                        print("ERRO: Arquivo XML com padrão diferente!")
+                        print("Campo natureza da operação:{natop}".format(natop=doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]))
+                        print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]))
+                        print("ICMSTot: vBC = {vbctot}".format(vbctot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]))
+                        err_doc = doc['nfeProc']['NFe']["infNFe"]["det"]                        
+                        if isinstance(err_doc, list):
+                            for i in range(len(err_doc)):
+                                for k in err_doc[i]['imposto']["ICMS"].keys():
+                                    if "CST" in err_doc[i]['imposto']["ICMS"][k].keys():
+                                        print("CST: {cst}".format(cst=err_doc[i]['imposto']["ICMS"][k]["CST"]))
+                                    if "CSOSN" in err_doc[i]['imposto']["ICMS"][k].keys():
+                                        print("CSOSN: {csosn}".format(csosn=err_doc[i]['imposto']["ICMS"][k]["CSOSN"]))
                         state = -1
                         break
             else:
@@ -98,8 +102,6 @@ class Xml:
                     vBC_COFINS = new_doc['nfeProc']['NFe']['infNFe']['det']['imposto']["COFINS"]["COFINSAliq"]["vBC"]
                     new_vBC_COFINS = str(round(eval(vBC_COFINS+'-'+vICMS),2))
                     new_doc['nfeProc']['NFe']['infNFe']['det']['imposto']["COFINS"]["COFINSAliq"]["vBC"] = new_vBC_COFINS
-
-                    #################################################################################
 
                     #REGRA 2
                     pPIS = new_doc['nfeProc']['NFe']['infNFe']['det']['imposto']["PIS"]["PISAliq"]["pPIS"]
@@ -117,7 +119,17 @@ class Xml:
                     new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vPIS"] = new_vPIS
                     new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vCOFINS"] = new_vCOFINS
                 except Exception as err:
-                    print("ERRO: Arquivo XML com padrão diferente!")
+                    print("Campo natureza da operação:{natop}".format(natop=doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]))
+                    print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]))
+                    print("ICMSTot: vBC = {vbctot}".format(vbctot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]))
+                    err_doc = doc['nfeProc']['NFe']["infNFe"]["det"]
+                    err_ICMS = err_doc['imposto']["ICMS"]
+                    for k in err_ICMS.keys():
+                        if "CST" in err_ICMS[k].keys():
+                            print("CST: {cst}".format(cst=err_ICMS[k]["CST"]))
+                        if "CSOSN" in err_ICMS[k].keys():
+                            print("CSOSN: {csosn}".format(csosn=err_ICMS[k]["CSOSN"]))  
+
                     state = -1
             fd.close()
 
@@ -125,4 +137,4 @@ class Xml:
                 with open(os.path.join("..","output",xml[:-4]+" - ALTERADO.xml"), 'w') as result_file:
                     print(f'O arquivo "{xml}" foi alterado com sucesso!\n')
                     result_file.write(xmltodict.unparse(new_doc,full_document=False))
-        if state==0: print("XML não possui CPNJ emitente desejado!".format(cnpj=cnpj))
+        if state==0: print("CNPJ emitente não encontrado neste XML!".format(cnpj=cnpj))
