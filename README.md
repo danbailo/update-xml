@@ -33,10 +33,10 @@ Para executar o programa, abra um PowerShell/Prompt de Comando no diretório cor
     * `python main.py -h`
 * **Executa o programa passando todos os arquivos XML que estão localizados na pasta `input`, onde serão analisados todos os CNPJ que foram escritos no arquivo `cnpj.csv`.**:
     
-    * `python main.py -f ..\\input --cnpj ..\\cnpj.csv` 
+    * `python main.py -f ..\input --cnpj ..\cnpj.csv` 
 
 * **Executa o programa passando somente um arquivo XML para ser analisado:**
-    * `python main.py -f ..\\input\\35190912331433000109550010000399671725554367.xml --cnpj ..\\cnpj.csv` 
+    * `python main.py -f ..\input\35190912331433000109550010000399671725554367.xml --cnpj ..\cnpj.csv` 
 
 A saída do programa será gravada na pasta `output`, onde esta contem o arquivo XML que foi atualizado.
 
