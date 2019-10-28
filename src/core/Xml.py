@@ -1,12 +1,18 @@
 import xmltodict
+import unicodedata
 import re
 import os
+
 
 class Xml:
     def __init__(self, file = None, cnpj = None):        
         self.__xml = file
         self.__cnpj = cnpj
-    
+
+        # print(self.__xml)
+        # exit()
+
+
     def get_xml(self):
         if os.path.isfile(self.__xml):
             if self.__xml[-4:].lower() == ".xml": 
@@ -27,15 +33,24 @@ class Xml:
         with open(self.__cnpj,"r") as csv:
             all_cnpj = [re.sub(pattern=r"\D", repl="", string=cnpj) for cnpj in csv.readlines()]
         return set(all_cnpj)
+  
 
-    def update_fields(self):
+    def update_fields(self): 
         for xml in self.get_xml():
-            if len(self.get_xml()) == 1: 
-                fd = open(os.path.join(self.__xml), encoding="utf8")
+            if len(self.get_xml()) == 1:
+                fd = open(os.path.join(self.__xml))
             else : 
-                fd = open(os.path.join(self.__xml,xml), encoding="utf8")
-            
-            doc = xmltodict.parse(fd.read())
+                fd = open(os.path.join(self.__xml,xml))
+
+            try:
+                text = fd.read()
+            except Exception as msg:
+                print(msg)
+                text = fd.read().decode("latin-1")
+
+            doc = xmltodict.parse(text)
+            fd.close()
+
             for cnpj in self.get_cnpj():
                 if self.__check_cnpj(cnpj, doc):
                     state = 1
@@ -129,8 +144,7 @@ class Xml:
                         if "CSOSN" in err_ICMS[k].keys():
                             print("CSOSN: {csosn}".format(csosn=err_ICMS[k]["CSOSN"]))  
 
-                    state = -1
-            fd.close()
+                    state = -1            
 
             if state != -1:
                 with open(os.path.join("..","output",xml[:-4]+" - ALTERADO.xml"), 'w') as result_file:

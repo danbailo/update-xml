@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 def get_args():
 	parser=argparse.ArgumentParser(
@@ -7,8 +8,6 @@ def get_args():
 	)
 
 	parser.add_argument("-f","--file",
-		# action="store",
-		# dest="file",
 		type=str,
         required=True,
 		metavar="arquivo.xml|diretório",
@@ -16,8 +15,6 @@ def get_args():
 	)
 
 	parser.add_argument("--cnpj",
-		# action="store",
-		# dest="file",
 		type=str,
         required=True,
 		metavar="arquivo.csv",

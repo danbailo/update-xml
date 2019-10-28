@@ -1,12 +1,11 @@
 from core import Xml
-import utils
+import args
 
 if __name__ == "__main__":
+    args = args.get_args()
+    print(args)
 
-    args = utils.get_args()
 
-    xml = Xml(args.file,args.cnpj)
-
-    # print(xml.get_cnpj())
-
+    xml = Xml(args.file,args.cnpj)    
     xml.update_fields()
+    
