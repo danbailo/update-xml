@@ -11,13 +11,17 @@ class Xml:
 
     def get_xml(self):
         if os.path.isfile(self.__xml):
-            if self.__xml[-4:].lower() == ".xml": 
+            if self.__xml[-4:].lower() == ".xml":
+                self.__isfile = True
+                self.__isdir = False
                 return [self.__xml.split("/")[-1]]
             print("Por favor, entre com um arquivo .xml!")
             exit(-1)
         if os.path.isdir(self.__xml):
             xmls = [xml for xml in os.listdir(self.__xml) if xml[-4:].lower()==".xml"]
             if len(xmls) == 0: return None
+            self.__isfile = False
+            self.__isdir = True
             return xmls
 
     def __check_cnpj(self, cnpj, doc):
@@ -30,7 +34,6 @@ class Xml:
             all_cnpj = [re.sub(pattern=r"\D", repl="", string=cnpj) for cnpj in csv.readlines()]
         return set(all_cnpj)
   
-
     def update_fields(self): 
         for xml in self.get_xml():
             if len(self.get_xml()) == 1:
@@ -45,13 +48,12 @@ class Xml:
                 del fd
                 if len(self.get_xml()) == 1:
                     fd = open(os.path.join(self.__xml), encoding="utf-8")
-                else : 
+                else: 
                     fd = open(os.path.join(self.__xml,xml), encoding="utf-8")
                 text = fd.read()
-
+                
             doc = xmltodict.parse(text)
             fd.close()
-
             for cnpj in self.get_cnpj():
                 if self.__check_cnpj(cnpj, doc):
                     state = 1
@@ -144,14 +146,16 @@ class Xml:
                             print("CST: {cst}".format(cst=err_ICMS[k]["CST"]))
                         if "CSOSN" in err_ICMS[k].keys():
                             print("CSOSN: {csosn}".format(csosn=err_ICMS[k]["CSOSN"]))  
-
-                    state = -1            
-
+                    state = -1
             if state != -1:
-                print((os.path.join('D:', 'Documents', 'Programming', 'update-xml', 'src',"..","output",xml[:-4]+" - ALTERADO.xml")))
-                print(os.getcwd().split("\\"))
-                exit()
-                result_file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","output",xml[:-4]+" - ALTERADO.xml"), 'w')
+                if self.__isfile:
+                    xml_splitted = xml[:-4].split("\\")
+                    xml = xml_splitted[-1]
+                    result_file = open(os.path.join(".","..","output",xml+" - ALTERADO.xml"), 'w')
+                    xml = xml+".xml"
+                else:
+                    print(xml[:-4])
+                    result_file = open(os.path.join(".","..","output",xml[:-4]+" - ALTERADO.xml"), 'w')
                 print(f'O arquivo "{xml}" foi alterado com sucesso!\n')
                 result_file.write(xmltodict.unparse(new_doc,full_document=False))
                 result_file.close()
