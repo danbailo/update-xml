@@ -1,8 +1,6 @@
 import xmltodict
-import unicodedata
 import re
 import os
-
 
 class Xml:
     def __init__(self, file = None, cnpj = None):        
@@ -51,7 +49,7 @@ class Xml:
                 else: 
                     fd = open(os.path.join(self.__xml,xml), encoding="utf-8")
                 text = fd.read()
-                
+
             doc = xmltodict.parse(text)
             fd.close()
             for cnpj in self.get_cnpj():
@@ -154,7 +152,6 @@ class Xml:
                     result_file = open(os.path.join(".","..","output",xml+" - ALTERADO.xml"), 'w')
                     xml = xml+".xml"
                 else:
-                    print(xml[:-4])
                     result_file = open(os.path.join(".","..","output",xml[:-4]+" - ALTERADO.xml"), 'w')
                 print(f'O arquivo "{xml}" foi alterado com sucesso!\n')
                 result_file.write(xmltodict.unparse(new_doc,full_document=False))
