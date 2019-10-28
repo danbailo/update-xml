@@ -9,10 +9,6 @@ class Xml:
         self.__xml = file
         self.__cnpj = cnpj
 
-        # print(self.__xml)
-        # exit()
-
-
     def get_xml(self):
         if os.path.isfile(self.__xml):
             if self.__xml[-4:].lower() == ".xml": 
@@ -44,9 +40,14 @@ class Xml:
 
             try:
                 text = fd.read()
-            except Exception as msg:
-                print(msg)
-                text = fd.read().decode("latin-1")
+            except Exception:
+                fd.close()
+                del fd
+                if len(self.get_xml()) == 1:
+                    fd = open(os.path.join(self.__xml), encoding="utf-8")
+                else : 
+                    fd = open(os.path.join(self.__xml,xml), encoding="utf-8")
+                text = fd.read()
 
             doc = xmltodict.parse(text)
             fd.close()
@@ -89,7 +90,7 @@ class Xml:
                         #REGRA 5
                         new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vPIS"] = new_vPIS
                         new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vCOFINS"] = new_vCOFINS
-                    except Exception as err:
+                    except Exception:
                         print("Campo natureza da operação:{natop}".format(natop=doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]))
                         print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]))
                         print("ICMSTot: vBC = {vbctot}".format(vbctot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]))
@@ -132,7 +133,7 @@ class Xml:
                     #REGRA 5
                     new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vPIS"] = new_vPIS
                     new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vCOFINS"] = new_vCOFINS
-                except Exception as err:
+                except Exception:
                     print("Campo natureza da operação:{natop}".format(natop=doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]))
                     print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]))
                     print("ICMSTot: vBC = {vbctot}".format(vbctot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]))
@@ -147,7 +148,11 @@ class Xml:
                     state = -1            
 
             if state != -1:
-                with open(os.path.join("..","output",xml[:-4]+" - ALTERADO.xml"), 'w') as result_file:
-                    print(f'O arquivo "{xml}" foi alterado com sucesso!\n')
-                    result_file.write(xmltodict.unparse(new_doc,full_document=False))
+                print((os.path.join('D:', 'Documents', 'Programming', 'update-xml', 'src',"..","output",xml[:-4]+" - ALTERADO.xml")))
+                print(os.getcwd().split("\\"))
+                exit()
+                result_file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","output",xml[:-4]+" - ALTERADO.xml"), 'w')
+                print(f'O arquivo "{xml}" foi alterado com sucesso!\n')
+                result_file.write(xmltodict.unparse(new_doc,full_document=False))
+                result_file.close()
         if state==0: print("CNPJ emitente não encontrado neste XML!".format(cnpj=cnpj))
