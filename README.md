@@ -1,7 +1,7 @@
 # Atualizar arquivos XML
 
 ## Descrição
-Este projeto consiste em realizar algumas operações matemáticas em determinados arquivos XML que contenham determinado CNPJ no campo emitente, onde os CNPJ que serão verificados estão escritos no arquivo [CNPJ.csv](CNPJ.csv). Após isso, será gerado um [Relatório.csv](Relatório.csv) contendo informações sobre os arquivos XML que não foram alterados.
+Este projeto consiste em realizar algumas operações matemáticas em determinados arquivos XML que contenham determinado CNPJ no campo emitente, onde os CNPJ que serão verificados estão escritos no arquivo [CNPJ.csv](CNPJ.csv). Após isso, será gerado um relatório contendo informações sobre os arquivos XML que não foram alterados.
 
 ---
 ## Requisitos
@@ -38,12 +38,12 @@ Para executar o programa, abra um PowerShell/Prompt de Comando no diretório cor
     Caso nenhum parâmetro seja passado para o CNPJ, por padrão será carregado os CNPJs que estão escritos no arquivo CNPJ.csv na raiz pasta.
 
 * **É possivel também, carregar outro arquivo diferente deste padrão para ler os CNPJs, desde que este esteja no formato .csv, basta usar o parametro --cnpj e inserir o caminho do arquivo**
-    * `python main.py -f ..\input --cnpj ..\cnpj.csv` 
+    * `python main.py -f ..\input --cnpj ..\CNPJ.csv` 
 
 * **Executa o programa passando somente um arquivo XML para ser analisado:**
     * `python main.py -f ..\input\35190912331433000109550010000399671725554367.xml` 
 
-    * `python main.py -f ..\input\35190912331433000109550010000399671725554367.xml --cnpj ..\cnpj.csv` 
+    * `python main.py -f ..\input\35190912331433000109550010000399671725554367.xml --cnpj ..\CNPJ.csv` 
 
 
 A saída do programa será um relatório dos XMLs que não foram alterados, onde este será gravado na raiz da pasta e 

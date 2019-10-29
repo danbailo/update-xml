@@ -18,7 +18,7 @@ def get_args():
 	parser.add_argument("--cnpj",
 		type=str,
         required=False,
-		metavar="cnpj.csv",
+		metavar="CNPJ.csv",
 		default=os.path.join("..","CNPJ.csv"),
 		help="Arquivo contendo os CNPJs emitentes. Em caso de dúvidas, leia o arquivo README.md",
 	)
