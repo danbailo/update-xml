@@ -200,5 +200,5 @@ class Xml:
             self.__report.save(os.path.join("..","Relatório.docx"))
             print("O relatório dos XMLs que não foram alterados foi gerado com sucesso!")
         except Exception:
-            print("Por favor, feche o documento Word e execute novamente o programa para gerar o relatório!")
+            print("Por favor, feche o documento Word e execute novamente o programa para gerar um novo relatório!")
             exit(-1)
