@@ -1,3 +1,5 @@
+from docx import Document
+from docx.shared import Inches
 import xmltodict
 import re
 import os
@@ -6,6 +8,8 @@ class Xml:
     def __init__(self, file = None, cnpj = None):        
         self.__xml = file
         self.__cnpj = cnpj
+        self.__report = Document()
+        self.__report.add_heading("XMLs que não sofreram alterações",level=0)
 
     def get_xml(self):
         if os.path.isfile(self.__xml):
@@ -32,7 +36,7 @@ class Xml:
             all_cnpj = [re.sub(pattern=r"\D", repl="", string=cnpj) for cnpj in csv.readlines()]
         return set(all_cnpj)
   
-    def update_fields(self): 
+    def update_fields(self):        
         for xml in self.get_xml():
             if len(self.get_xml()) == 1:
                 fd = open(os.path.join(self.__xml))
@@ -91,17 +95,33 @@ class Xml:
                         new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vPIS"] = new_vPIS
                         new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vCOFINS"] = new_vCOFINS
                     except Exception:
-                        print("Campo natureza da operação:{natop}".format(natop=doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]))
-                        print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]))
-                        print("ICMSTot: vBC = {vbctot}".format(vbctot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]))
-                        err_doc = doc['nfeProc']['NFe']["infNFe"]["det"]                        
+                        natop = doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]
+                        vicmstot = doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]
+                        vbctot = doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]
+                        cst = ''
+                        csosn = ''
+                        print("Campo natureza da operação:{natop}".format(natop=natop))
+                        print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=vicmstot))
+                        print("ICMSTot: vBC = {vbctot}".format(vbctot=vbctot))                        
+                        
+                        err_doc = doc['nfeProc']['NFe']["infNFe"]["det"]
                         if isinstance(err_doc, list):
                             for i in range(len(err_doc)):
                                 for k in err_doc[i]['imposto']["ICMS"].keys():
                                     if "CST" in err_doc[i]['imposto']["ICMS"][k].keys():
-                                        print("CST: {cst}".format(cst=err_doc[i]['imposto']["ICMS"][k]["CST"]))
+                                        cst = err_doc[i]['imposto']["ICMS"][k]["CST"]
+                                        print("CST: {cst}".format(cst=cst))
                                     if "CSOSN" in err_doc[i]['imposto']["ICMS"][k].keys():
-                                        print("CSOSN: {csosn}".format(csosn=err_doc[i]['imposto']["ICMS"][k]["CSOSN"]))
+                                        csosn = err_doc[i]['imposto']["ICMS"][k]["CSOSN"]
+                                        print("CSOSN: {csosn}".format(csosn=csosn))
+                        self.__report.add_heading("Arquivo: {xml}".format(xml=xml),level=1)
+                        self.__report.add_paragraph("Campo natureza da operação:{natop}".format(natop=natop))
+                        self.__report.add_paragraph("ICMSTot: vICMS = {vicmstot}".format(vicmstot=vicmstot))
+                        self.__report.add_paragraph("ICMSTot: vBC = {vbctot}".format(vbctot=vbctot))
+                        if cst:
+                            self.__report.add_paragraph("CST: {cst}".format(cst=cst))
+                        if csosn:
+                            self.__report.add_paragraph("CSOSN: {csosn}".format(csosn=csosn))
                         state = -1
                         break
             else:
@@ -134,18 +154,37 @@ class Xml:
                     new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vPIS"] = new_vPIS
                     new_doc['nfeProc']['NFe']['infNFe']["total"]["ICMSTot"]["vCOFINS"] = new_vCOFINS
                 except Exception:
-                    print("Campo natureza da operação:{natop}".format(natop=doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]))
-                    print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]))
-                    print("ICMSTot: vBC = {vbctot}".format(vbctot=doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]))
+                    natop = doc["nfeProc"]["NFe"]["infNFe"]["ide"]["natOp"]
+                    vicmstot = doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMS"]
+                    vbctot = doc["nfeProc"]["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]
+                    cst = ''
+                    csosn = ''
+                    print("Campo natureza da operação: {natop}".format(natop=natop))
+                    print("ICMSTot: vICMS = {vicmstot}".format(vicmstot=vicmstot))
+                    print("ICMSTot: vBC = {vbctot}".format(vbctot=vbctot))       
+
                     err_doc = doc['nfeProc']['NFe']["infNFe"]["det"]
                     err_ICMS = err_doc['imposto']["ICMS"]
                     for k in err_ICMS.keys():
                         if "CST" in err_ICMS[k].keys():
-                            print("CST: {cst}".format(cst=err_ICMS[k]["CST"]))
+                            cst = err_ICMS[k]["CST"]
+                            print("CST: {cst}".format(cst=cst))
                         if "CSOSN" in err_ICMS[k].keys():
-                            print("CSOSN: {csosn}".format(csosn=err_ICMS[k]["CSOSN"]))  
+                            csosn = err_ICMS[k]["CSOSN"]
+                            print("CSOSN: {csosn}".format(csosn=csosn))
+                    
+                    self.__report.add_heading("Arquivo: {xml}".format(xml=xml),level=1)
+                    self.__report.add_paragraph("Campo natureza da operação: {natop}".format(natop=natop))
+                    self.__report.add_paragraph("ICMSTot: vICMS = {vicmstot}".format(vicmstot=vicmstot))
+                    self.__report.add_paragraph("ICMSTot: vBC = {vbctot}".format(vbctot=vbctot))
+                    if cst:
+                        self.__report.add_paragraph("CST: {cst}".format(cst=cst))
+                    if csosn:
+                        self.__report.add_paragraph("CSOSN: {csosn}".format(csosn=csosn))
                     state = -1
             if state != -1:
+                if not os.path.exists(os.path.join("..","output")):
+                    os.mkdir(os.path.join("..","output"))
                 if self.__isfile:
                     xml_splitted = xml[:-4].split("\\")
                     xml = xml_splitted[-1]
@@ -157,3 +196,9 @@ class Xml:
                 result_file.write(xmltodict.unparse(new_doc,full_document=False))
                 result_file.close()
         if state==0: print("CNPJ emitente não encontrado neste XML!".format(cnpj=cnpj))
+        try:
+            self.__report.save(os.path.join("..","Relatório.docx"))
+            print("O relatório dos XMLs que não foram alterados foi gerado com sucesso!")
+        except Exception:
+            print("Por favor, feche o documento Word e execute novamente o programa para gerar o relatório!")
+            exit(-1)
