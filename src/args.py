@@ -1,5 +1,6 @@
 import argparse
 import sys
+import os
 
 def get_args():
 	parser=argparse.ArgumentParser(
@@ -16,8 +17,9 @@ def get_args():
 
 	parser.add_argument("--cnpj",
 		type=str,
-        required=True,
-		metavar="arquivo.csv",
+        required=False,
+		metavar="cnpj.csv",
+		default=os.path.join("..","CNPJ.csv"),
 		help="Arquivo contendo os CNPJs emitentes. Em caso de dúvidas, leia o arquivo README.md",
 	)
 
